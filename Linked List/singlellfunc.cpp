@@ -55,12 +55,13 @@ int count() {
 void print() {
     Movie *current = head;
     cout << "There are " << count() << " nodes in the linked list\n";
-    
+    int i = 1;
     while (current != nullptr) {
-        cout << "Title " << count << ": " << current->title << "\n";
-        cout << "Director " << count << ": " << current->director << "\n";
-        cout << "Year " << count << ": " << current->year << "\n";
+        cout << "Title " << i << ": " << current->title << "\n";
+        cout << "Director " << i << ": " << current->director << "\n";
+        cout << "Year " << i << ": " << current->year << "\n";
         current = current->next;
+        i++;
     }
 }
 

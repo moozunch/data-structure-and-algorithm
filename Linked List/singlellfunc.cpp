@@ -92,12 +92,19 @@ void deletFront(){
 
 void deleteBack(){
     Movie *del, *current;
-    del = tail; //yang mau kita hapus
+    del = tail; //yang mau kita hapus, kita connect nya itu ke next node terakhir yaiut nullptr, ingat kalau diakses pointer bisa akses seluruh isinya.
     current = head; //perlu untuk tranverse
     
     //Unlike delete front, because we need to change the tail to the node-1, we need to traverse through the linked list
+
     while (current->next != tail) {
-        current = current->next; //ini kan bakal terus ganti nilai nya sampai sebelum tail sehingga current jadi sebelum tail dapet
+        current = current->next; 
+
+        //logika
+        // In the first iteration, current points to A, and current->next points to B. Since B is not tail, the loop continues.
+        // In the second iteration, current points to B, and current->next points to C. Since C is not tail, the loop continues.
+        // In the third iteration, current points to C, and current->next points to D. Since D is tail, the loop exits. jadi dia current nya tetap di c tapi point nya udah nunjuk ke D.
+
     }
     current->next = nullptr;
     tail = current; //ubah tail jadi yang current /sekarang.

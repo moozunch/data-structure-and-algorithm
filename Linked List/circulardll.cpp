@@ -1,33 +1,21 @@
 #include <iostream>
 #include <string>
 using namespace std;
-//circular single linked list, circular meaning threre is no null at the end of the list.
-//tail menunjuk ke head kembali.
 
-//deklarasi dan inisialisasi mirip dengan single linked list
+//Double punya 2 pointer next dan prev, next nya menunjuk ke node selanjutnya dan prev nya menunjuk ke node sebelumnya.
+
+
 struct Data{
     string nama, id;
-    int umur;
-    Data *next;
+    int age;
+    Data *next, *prev;
 };
+
 Data *head = nullptr;
 Data *tail = nullptr;
 
-
-// void create() {
-//     head = new Data;
-
-//     cout << "Masukkan nama: ";
-//     getline(cin, head->nama);
-//     cout << "Masukkan id: ";
-//     cin >> head->id;
-//     cout << "Masukkan umur: ";
-//     cin >> head->umur;
-//     tail = head;
-//     tail->next = head; 
-// } we can do this but I'll just put the logic in addFront with nullptr condition or no linked list created yet.
-
 int count(){
+    if (head == nullptr) return 0;
     Data *current = head;
     int i = 0;
     do {
@@ -37,6 +25,22 @@ int count(){
     return i;
 }
 
+void print(){
+    Data *current = head;
+    if (head == nullptr) {
+        cout << "List is empty!" << endl;
+        return;
+    }
+    cout << "Total data: " << count() << endl;
+    cout << "Nama             | ID          | Umur" << endl;
+    cout << "-------------------------------------" << endl;
+    do {
+        cout << current->nama << " | " << current->id << " | " << current->age << endl;
+    cout << "-------------------------------------" << endl;
+        current = current->next;
+    } while (current != head); //jadi head yang pertama di print juga.
+}
+
 void addFront() {
     Data *node = new Data;
     cout << "Masukkan nama: ";
@@ -44,15 +48,18 @@ void addFront() {
     getline(cin, node->nama);
     cout << "Masukkan id: ";
     cin >> node->id;
-    cout << "Masukkan umur: ";
-    cin >> node->umur;
+    cout << "Masukkan age: ";
+    cin >> node->age;
     if (head == nullptr) {
         head = tail = node;
-        node->next = head;
+        node->next = node->prev = head;
     } else {
+        //yang penting urus prev dan next si node, juga prev head dan next tail.
         node->next = head;
+        node->prev = tail;
+        head->prev = node;
+        tail->next = node; //perbarui agar tail selalu menunjuk ke node yang baru.
         head = node;
-        tail->next = head; //perbarui agar tail selalu menunjuk ke head yang baru.
     }
 }
 
@@ -64,13 +71,15 @@ void addBack(){
     cout << "Masukkan id: ";
     cin >> node->id;
     cout << "Masukkan umur: ";
-    cin >> node->umur;
+    cin >> node->age;
     if (head == nullptr) {
         addFront();
     } else {
+        node->prev = tail;
         tail->next = node; //tail yang lama, kita ganti next nya ke node yang baru
+        node->next = head;
+        head->prev = node; //perbarui agar head prev selalu menunjuk ke node yang baru.
         tail = node; //ganti tail dengan node yang baru
-        tail->next = head; //perbarui agar tail selalu menunjuk ke head yang baru.
     }
 }
 
@@ -95,15 +104,16 @@ void addPosition(int position) {
     cout << "Masukkan id: ";
     cin >> node->id;
     cout << "Masukkan umur: ";
-    cin >> node->umur;
+    cin >> node->age;
 
     for (int i = 1; i < position - 1; i++) {
         current = current->next;
     }
     
     node->next = current->next;
+    node->prev = current;
+    current->next->prev = node;
     current->next = node;
-
 }
 
 void deleteFront() {
@@ -111,18 +121,18 @@ void deleteFront() {
     //ubah headnya ke head->next atau head yang setelahnya.
     tail->next = head->next;
     head = head->next;
+    head->prev = tail;
     delete del;
 }
 
 void deleteBack() {
     Data *del = tail;
     Data *current = head;
-    //iterasi sampai sebelum tail
-    while (current->next != tail) {
-        current = current->next;
-    }
-    current->next = head; //current yang sebelum tail, kita ganti next nya ke head
-    tail = current; //tail kita ganti dengan current
+
+    tail = tail->prev;
+    //nggak perlu iterasi karena ada prev
+    tail->next = head; //karena kita mau hapus tail, maka sebelum tail kita ganti next nya ke head
+    head->prev = tail;
     delete del;
 }
 
@@ -136,7 +146,7 @@ void deletePosition(int position) {
     } else if (position == 1) {
         deleteFront();
         return;
-    } else if (position < 1 && position > count()) {
+    } else if (position < 1 || position > count()) {
         cout << "Invalid position!" << endl;
         return;
     }
@@ -145,43 +155,26 @@ void deletePosition(int position) {
         current = current->next;
     }
     
-    current->next = current->next->next; //kita ubah dulu si arah setelah current ke lompat dua, karena current->next nya yang mau kita hapus
     del = current->next; //yang mau kita hapus
+    current->next = del->next;
+    del->next->prev = current; //prev nya setelah node del kita ganti ke current
     delete del;
 
 }
 
-
-
-void print(){
-    Data *current = head;
-    cout << "Total data: " << count() << endl;
-    cout << "Nama             | ID          | Umur" << endl;
-    cout << "-------------------------------------" << endl;
-    do {
-        cout << current->nama << " | " << current->id << " | " << current->umur << endl;
-    cout << "-------------------------------------" << endl;
-        current = current->next;
-    } while (current != head); //jadi head yang pertama di print juga.
-}
-
-
 int main() {
     addFront();
     addFront();
-    addFront();
-    print();
     addBack();
-    addBack();
+    addPosition(2);
     print();
     deleteFront();
     deleteBack();
     print();
     addFront();
-    addFront();
-    print();
-    addPosition(2);
     print();
     deletePosition(2);
     print();
+    return 0;
 }
+
